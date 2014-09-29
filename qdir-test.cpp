@@ -1,14 +1,23 @@
 // Tests for QDir
+#include <QCoreApplication>
 #include <QDir>
 #include <QString>
-#include <QTextStream>
+#include <iostream>
 
-int main()
+int main(int argc, char *argv[])
 {
-   QTextStream cout{stdout};
-   QDir directory{"Documents/Letters"};
-   QString path{directory.filePath("contents.txt")};
-   QString absolutePath{directory.absoluteFilePath("contents.txt")};
+   QCoreApplication app{argc, argv};
+   QDir dir;
+   dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+   dir.setSorting(QDir::Size | QDir::Reversed);
 
-   cout << path << endl << absolutePath << endl;
+   QFileInfoList list{dir.entryInfoList()};
+   std::cout << "    Bytes Filename" << std::endl;
+   for (int i=0; i<list.size(); ++i) {
+      QFileInfo fileInfo{list.at(i)};
+      std::cout << qPrintable(QString{"%1 %2"}.arg(fileInfo.size(), 10)
+                                            .arg(fileInfo.fileName()));
+      std::cout << std::endl;
+   }
+   return 0;
 }
